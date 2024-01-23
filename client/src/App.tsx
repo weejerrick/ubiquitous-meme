@@ -3,7 +3,7 @@ import './App.css'
 import { postData } from './api';
 import { checkXSS } from './utils';
 
-const MAX_LENGTH = 4096;
+const MAX_LENGTH = 255;
 const errorStates = {
   'NONE': 'None',
   'INVALID_BODY_MAX_LENGTH': 'Buffer Overflow',
