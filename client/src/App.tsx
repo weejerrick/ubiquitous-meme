@@ -4,18 +4,33 @@ import { postData } from './api';
 import { checkXSS } from './utils';
 
 const MAX_LENGTH = 4096;
-
 const errorStates = {
   'none': 'None',
   'xss': 'XSS',
 }
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
 function App() {
   const [text, setText] = useState('');
   const [isMalicious, setIsMalicious] = useState('none')
+  const [fileSize, setFileSize] = useState(0);
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        alert('File size exceeds the maximum limit');
+        e.target.value = ''; // Remove the selected file
+        setFileSize(0); // Reset the file size state
+        return;
+      } else {
+        setFileSize(file.size);
+      }
+    }
   };
 
   const handleSubmit = () => {
@@ -47,7 +62,11 @@ function App() {
           id="image_upload"
           type="file"
           accept=".jpg, .jpeg, .png"
+          onChange={handleFileChange}
         />
+      </div>
+      <div>
+        <span>File size: {fileSize} bytes</span>
       </div>
       <button onClick={handleSubmit}>Submit</button>
       {isMalicious !== 'none' && (
