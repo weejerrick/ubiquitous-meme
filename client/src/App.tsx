@@ -1,13 +1,20 @@
 import { ChangeEvent, useState } from 'react'
 import './App.css'
+import { postData } from './api';
 
 const MAX_LENGTH = 4096;
 function App() {
-  const [count, setCount] = useState(0);
+  const [text, setText] = useState('');
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setCount(e.target.value?.length);
+    setText(e.target.value);
   };
+
+  const handleSubmit = () => {
+    postData({
+      data: text,
+    })
+  }
 
   return (
     <div>
@@ -19,14 +26,17 @@ function App() {
         handleTextChange
       } />
       <div style={{ marginTop: 5, marginBottom: 20 }}>
-        <span>{count}/{MAX_LENGTH}</span>
+        <span>{text?.length}/{MAX_LENGTH}</span>
       </div>
       <div style={{ marginBottom: 20 }}>
-        <input type="file" id="avatar" name="avatar"
-          accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        <label style={{display: 'block'}} htmlFor="image_upload">Choose images to upload (PNG, JPG)</label>
+        <input
+          id="image_upload"
+          type="file"
+          accept=".jpg, .jpeg, .png"
         />
       </div>
-      <button>Submit</button>
+      <button onClick={handleSubmit}>Submit</button>
     </div>
   )
 }
