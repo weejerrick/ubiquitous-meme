@@ -4,12 +4,16 @@ import { postData } from './api';
 import { checkXSS } from './utils';
 
 const MAX_LENGTH = 255;
-const errorStates = {
-  'NONE': 'None',
-  'INVALID_BODY_MAX_LENGTH': 'Buffer Overflow',
-  'INVALID_BODY_XSS': 'Cross Site Scripting',
-  'INVALID_BODY_SQL': 'SQL Injection',
-}
+
+const errorMap = new Map(
+  [
+    ['NONE', 'None'],
+    ['INVALID_BODY_MAX_LENGTH', 'Buffer Overflow'],
+    ['INVALID_BODY_XSS', 'Cross Site Scripting'],
+    ['INVALID_BODY_SQL', 'SQL Injection']
+  ]
+)
+
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
 function App() {
@@ -39,7 +43,7 @@ function App() {
   const handleSubmit = async () => {
     setIsSuccess(false)
     if (checkXSS(text)) {
-      setIsMalicious('xss');
+      setIsMalicious('INVALID_BODY_XSS');
       return;
     }
     setIsMalicious('none')
@@ -80,10 +84,9 @@ function App() {
       </div>
       <button onClick={handleSubmit}>Submit</button>
       {isMalicious !== 'none' && (
-        <div style={{ marginTop: 30, height: 200, backgroundColor: '#ACFFAA', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+        <div style={{ marginTop: 30, height: 200, backgroundColor: '#FFAAAA', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
           <h2 style={{ margin: 5 }}>Malicious Code Suspected</h2>
-          // @ts-ignore
-          <h3>Vulnerability Type: {errorStates[isMalicious]}</h3>
+          <h3>Vulnerability Type: {errorMap.get(isMalicious)}</h3>
         </div>
       )}
       {isSuccess && (
