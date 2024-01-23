@@ -30,6 +30,16 @@ function App() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.name) {
+        const isFileNameValid = /^[a-z0-9_.@()-]+\.[^.]+$/i.test(file.name);
+        console.log('isFileNameValid', isFileNameValid)
+        if (!isFileNameValid) {
+          alert('File name looks malicious');
+          e.target.value = ''; // Remove the selected file
+        return;
+        }
+
+      }
       if (file.size > MAX_FILE_SIZE) {
         alert('File size exceeds the maximum limit');
         e.target.value = ''; // Remove the selected file
@@ -60,7 +70,7 @@ function App() {
         setIsSuccess(true)
       }
     } catch (e) {
-
+      console.log('e', e)
       setIsNetworkError(true);
     }
 
