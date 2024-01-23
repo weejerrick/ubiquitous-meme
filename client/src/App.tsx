@@ -5,8 +5,10 @@ import { checkXSS } from './utils';
 
 const MAX_LENGTH = 4096;
 const errorStates = {
-  'none': 'None',
-  'xss': 'XSS',
+  'NONE': 'None',
+  'INVALID_BODY_MAX_LENGTH': 'Buffer Overflow',
+  'INVALID_BODY_XSS': 'Cross Site Scripting',
+  'INVALID_BODY_SQL': 'SQL Injection',
 }
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
@@ -14,6 +16,7 @@ function App() {
   const [text, setText] = useState('');
   const [isMalicious, setIsMalicious] = useState('none')
   const [fileSize, setFileSize] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -33,15 +36,22 @@ function App() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsSuccess(false)
     if (checkXSS(text)) {
       setIsMalicious('xss');
       return;
     }
     setIsMalicious('none')
-    postData({
+    const res = await postData({
       data: text,
     })
+    const { success, code } = res;
+    if (code && !success) {
+      setIsMalicious(code)
+    } else {
+      setIsSuccess(true)
+    }
   }
 
   return (
@@ -71,8 +81,14 @@ function App() {
       <button onClick={handleSubmit}>Submit</button>
       {isMalicious !== 'none' && (
         <div style={{ marginTop: 30, height: 200, backgroundColor: '#ACFFAA', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <h2 style={{margin: 5}}>Malicious Code Suspected</h2>
-          <h3>Vulnerability Type: {errorStates.xss}</h3>
+          <h2 style={{ margin: 5 }}>Malicious Code Suspected</h2>
+          // @ts-ignore
+          <h3>Vulnerability Type: {errorStates[isMalicious]}</h3>
+        </div>
+      )}
+      {isSuccess && (
+        <div style={{ marginTop: 30, height: 200, backgroundColor: '#AAFFB7', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+          <h2 style={{ margin: 5 }}>No Malicious Code Found</h2>
         </div>
       )}
     </div>
