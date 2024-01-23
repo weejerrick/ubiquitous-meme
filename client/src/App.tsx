@@ -1,16 +1,29 @@
 import { ChangeEvent, useState } from 'react'
 import './App.css'
 import { postData } from './api';
+import { checkXSS } from './utils';
 
 const MAX_LENGTH = 4096;
+
+const errorStates = {
+  'none': 'None',
+  'xss': 'XSS',
+}
+
 function App() {
   const [text, setText] = useState('');
+  const [isMalicious, setIsMalicious] = useState('none')
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   };
 
   const handleSubmit = () => {
+    if (checkXSS(text)) {
+      setIsMalicious('xss');
+      return;
+    }
+    setIsMalicious('none')
     postData({
       data: text,
     })
@@ -29,7 +42,7 @@ function App() {
         <span>{text?.length}/{MAX_LENGTH}</span>
       </div>
       <div style={{ marginBottom: 20 }}>
-        <label style={{display: 'block'}} htmlFor="image_upload">Choose images to upload (PNG, JPG)</label>
+        <label style={{ display: 'block' }} htmlFor="image_upload">Choose images to upload (PNG, JPG)</label>
         <input
           id="image_upload"
           type="file"
@@ -37,6 +50,12 @@ function App() {
         />
       </div>
       <button onClick={handleSubmit}>Submit</button>
+      {isMalicious !== 'none' && (
+        <div style={{ height: 200, width: 500, backgroundColor: '#ACFFAA', borderRadius: 20, }}>
+          <h2>Malicious Code Suspected</h2>
+          <h3>Type: {errorStates.xss}</h3>
+        </div>
+      )}
     </div>
   )
 }
