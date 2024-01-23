@@ -21,6 +21,7 @@ function App() {
   const [isMalicious, setIsMalicious] = useState('none')
   const [fileSize, setFileSize] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isNetworkError, setIsNetworkError] = useState(false);
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -42,20 +43,27 @@ function App() {
 
   const handleSubmit = async () => {
     setIsSuccess(false)
+    setIsNetworkError(false)
     if (checkXSS(text)) {
       setIsMalicious('INVALID_BODY_XSS');
       return;
     }
     setIsMalicious('none')
-    const res = await postData({
-      data: text,
-    })
-    const { success, code } = res;
-    if (code && !success) {
-      setIsMalicious(code)
-    } else {
-      setIsSuccess(true)
+    try {
+      const res = await postData({
+        data: text,
+      })
+      const { success, code } = res;
+      if (code && !success) {
+        setIsMalicious(code)
+      } else {
+        setIsSuccess(true)
+      }
+    } catch (e) {
+
+      setIsNetworkError(true);
     }
+
   }
 
   return (
@@ -92,6 +100,11 @@ function App() {
       {isSuccess && (
         <div style={{ marginTop: 30, height: 200, backgroundColor: '#AAFFB7', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
           <h2 style={{ margin: 5 }}>No Malicious Code Found</h2>
+        </div>
+      )}
+      {isNetworkError && (
+        <div style={{ marginTop: 30, height: 200, backgroundColor: '#F5F5F5', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+          <h2 style={{ margin: 5 }}>Network error, please try again</h2>
         </div>
       )}
     </div>
