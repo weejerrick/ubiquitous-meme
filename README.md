@@ -1,2 +1,2 @@
 # ubiquitous-meme
-WAF Implementation
+A WAF implementation for an app that checks for malicious requests
