@@ -51,9 +51,9 @@ function App() {
       </div>
       <button onClick={handleSubmit}>Submit</button>
       {isMalicious !== 'none' && (
-        <div style={{ height: 200, width: 500, backgroundColor: '#ACFFAA', borderRadius: 20, }}>
-          <h2>Malicious Code Suspected</h2>
-          <h3>Type: {errorStates.xss}</h3>
+        <div style={{ marginTop: 30, height: 200, backgroundColor: '#ACFFAA', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+          <h2 style={{margin: 5}}>Malicious Code Suspected</h2>
+          <h3>Vulnerability Type: {errorStates.xss}</h3>
         </div>
       )}
     </div>
